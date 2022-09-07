@@ -12,12 +12,17 @@ i2c = I2C(id=i2c_id, sda=sda, scl=scl) #Initialize I2C
 pca = PCA9685(i2c=i2c) #Create PCA9685 object
 servos = Servos(i2c=i2c) #Create Servos object
 
-print(i2c.scan())
-
 while True:
     if uart.any():
         command = uart.read()
         message = str(command.rstrip(), 'utf8')#str(command)#command.decode('utf-8')#str(command.rstrip(), 'utf8')
         print(message)
+        
+        if message == "180":
+            servos.position(index=0, degrees=180)
+        elif message == "90":
+            servos.position(index=0, degrees=90)
+        else:
+            servos.position(index=0, degrees=0)
 
         
