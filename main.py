@@ -1,5 +1,5 @@
 from machine import Pin, UART, I2C
-from time import sleep
+from time import sleep, ticks_ms
 from pca import PCA9685
 from servo import Servos
 from braille_dictionary import braille_dictionary as b_dict
@@ -13,8 +13,11 @@ i2c_id = 1 #I2C id
 button_increase_pin = 15
 button_decrease_pin = 14
 current_letter = 0
+last_letter = 0
 last_time_increase = 0
 last_time_decrease = 0
+
+message_list = []
 
 i2c = I2C(id=i2c_id, sda=i2c_sda, scl=i2c_scl) #Initialize I2C
 pca = PCA9685(i2c=i2c) #Create PCA9685 object
@@ -60,17 +63,18 @@ def reset_servos():
 def handle_interrupt_increase(Pin):
     global current_letter, last_time_increase
     new_time = ticks_ms()
-    if (new_time - last_time_increase) > 200:
-        counter = counter + 1
-        print(counter)
+    if (new_time - last_time_increase) > 200 and (current_letter < len(message_list)-1):
+        current_letter = current_letter + 1
+        print(current_letter) #test
+        print(len(message_list)) #test
         last_time_increase = new_time
         
 def handle_interrupt_decrease(Pin):
     global current_letter, last_time_decrease
     new_time = ticks_ms()
-    if (new_time - last_time_decrease) > 200 and counter > 0:
-        counter = counter - 1
-        print(counter)
+    if (new_time - last_time_decrease) > 200 and current_letter > 0:
+        current_letter = current_letter - 1
+        print(current_letter) #test
         last_time_decrease = new_time
         
 button_increase = Pin(button_increase_pin, Pin.IN, Pin.PULL_UP)
@@ -86,12 +90,22 @@ while True:
         command = uart.read()
         message = str(command.rstrip(), 'utf8')#str(command)#command.decode('utf-8')#str(command.rstrip(), 'utf8')
         print(message) #test
-        braille_dots = letter_to_braille(message)     
-#         print(letter_to_braille(message))
+        message_list = list(message)
+        print(message_list) #test
+        current_letter = 0
+        braille_dots = letter_to_braille(message[current_letter])
+        print(message[current_letter]) #test
         print(braille_dots) #test
         physical_representation(braille_dots)
         update_servos()
         
+    if current_letter != last_letter:
+        braille_dots = letter_to_braille(message[current_letter])
+        print(message[current_letter]) #test
+        print(braille_dots) #test
+        physical_representation(braille_dots)
+        update_servos()
+        last_letter = current_letter
 #         if message == "180":
 #             servos.position(index=0, degrees=180)
 #         elif message == "90":
