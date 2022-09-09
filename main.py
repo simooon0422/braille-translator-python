@@ -28,7 +28,7 @@ braille_dots = [0, 0, 0, 0, 0, 0]
 serv_0_position = [90, 90, 90, 90, 90, 90]
 serv_1_position = [150, 150, 150, 30, 30, 30]
 serv_current_position = [90, 90, 90, 90, 90, 90]
-serv_position = [90, 90, 90, 90, 90, 90]
+serv_desired_position = [90, 90, 90, 90, 90, 90]
 
 
 def letter_to_braille(letter):
@@ -36,29 +36,32 @@ def letter_to_braille(letter):
     return braille_data
 
 def physical_representation(letter_data):
-    for i in letter_data:
+    for i in range(len(letter_data)):
         if letter_data[i] == 1:
-            serv_position[i] = serv_1_position[i]
+            serv_desired_position[i] = serv_1_position[i]
         else:
-            serv_position[i] = serv_0_position[i]
+            serv_desired_position[i] = serv_0_position[i]
 
 def update_servos():
+    print("des:") #test
+    print(serv_desired_position) #test
+#     for i in range(6):
+#         servos.position(index=i, degrees=serv_desired_position[i])
     for i in range(6):
-        if serv_current_position[i] < serv_position[i]:
-            for j in range(serv_current_position[i], serv_position[i], 1):
+        if serv_current_position[i] < serv_desired_position[i]:
+            for j in range(serv_current_position[i], serv_desired_position[i], 1):
                 servos.position(index=i, degrees=j)
                 serv_current_position[i] = j
                 sleep(0.01)
         else:
-            for j in range(serv_current_position[i], serv_position[i], -1):
+            for j in range(serv_current_position[i], serv_desired_position[i], -1):
                 servos.position(index=i, degrees=j)
                 serv_current_position[i] = j
                 sleep(0.01)
                 
 def reset_servos():
     for i in range(6):
-        for i in range(6):
-            servos.position(index=i, degrees=serv_0_position[i])
+        servos.position(index=i, degrees=serv_0_position[i])
             
 def handle_interrupt_increase(Pin):
     global current_letter, last_time_increase
@@ -88,7 +91,7 @@ reset_servos()
 while True:
     if uart.any():
         command = uart.read()
-        message = str(command.rstrip(), 'utf8')#str(command)#command.decode('utf-8')#str(command.rstrip(), 'utf8')
+        message = str(command, 'utf8')#str(command)#command.decode('utf-8')#str(command.rstrip(), 'utf8')
         print(message) #test
         message_list = list(message)
         print(message_list) #test
@@ -115,5 +118,5 @@ while True:
 
 # def update_servos():
 #     for i in range(6):
-#         servos.position(index=i, degrees=serv_position[i])        
+#         servos.position(index=i, degrees=serv_desired_position[i])        
 
