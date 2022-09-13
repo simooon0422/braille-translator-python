@@ -31,7 +31,7 @@ servos = Servos(i2c=i2c) #Create Servos object
 
 braille_dots = [0, 0, 0, 0, 0, 0] #data of braille version of letter
 serv_0_position = [90, 90, 90, 90, 90, 90] #servo position when pin is down
-serv_1_position = [115, 115, 115, 65, 65, 65] #servo position when pin is up
+serv_1_position = [125, 125, 130, 55, 40, 55] #servo position when pin is up
 serv_current_position = [90, 90, 90, 90, 90, 90] #current servo position
 serv_desired_position = [90, 90, 90, 90, 90, 90] #desired servo position
 
