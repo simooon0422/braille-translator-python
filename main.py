@@ -31,7 +31,7 @@ servos = Servos(i2c=i2c) #Create Servos object
 
 braille_dots = [0, 0, 0, 0, 0, 0] #data of braille version of letter
 serv_0_position = [90, 90, 90, 90, 90, 90] #servo position when pin is down
-serv_1_position = [125, 125, 130, 55, 40, 55] #servo position when pin is up
+serv_1_position = [125, 125, 130, 55, 40, 50] #servo position when pin is up
 serv_current_position = [90, 90, 90, 90, 90, 90] #current servo position
 serv_desired_position = [90, 90, 90, 90, 90, 90] #desired servo position
 
@@ -73,7 +73,7 @@ def reset_servos():
 def handle_interrupt_increase(Pin):
     global current_letter, last_time_increase
     new_time = ticks_ms()
-    if (new_time - last_time_increase) > 200 and (current_letter < len(message_list)-1):
+    if (new_time - last_time_increase) > 300 and (current_letter < len(message_list)-1):
         current_letter = current_letter + 1
         print(current_letter) #test
         print(len(message_list)) #test
@@ -82,7 +82,7 @@ def handle_interrupt_increase(Pin):
 def handle_interrupt_decrease(Pin):
     global current_letter, last_time_decrease
     new_time = ticks_ms()
-    if (new_time - last_time_decrease) > 200 and current_letter > 0:
+    if (new_time - last_time_decrease) > 300 and current_letter > 0:
         current_letter = current_letter - 1
         print(current_letter) #test
         last_time_decrease = new_time
@@ -118,15 +118,4 @@ while True:
         print(braille_dots) #test
         physical_representation(braille_dots) #specify desired servos positions
         update_servos() #update servos positions
-        last_letter = current_letter
-#         if message == "180":
-#             servos.position(index=0, degrees=180)
-#         elif message == "90":
-#             servos.position(index=0, degrees=90)
-#         else:
-#             servos.position(index=0, degrees=0)
-
-# def update_servos():
-#     for i in range(6):
-#         servos.position(index=i, degrees=serv_desired_position[i])        
-
+        last_letter = current_letter    
